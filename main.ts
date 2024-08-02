@@ -1,8 +1,8 @@
-import fastify from 'fastify';
+import * as express from 'express';
 import { Gauge, Registry } from 'prom-client';
 
-// Create a Fastify instance
-const app = fastify({ logger: true });
+// Create an Express instance
+const app = express();
 
 // Create a registry
 const register = new Registry();
@@ -31,37 +31,31 @@ function getRandomUserId() {
 }
 
 function getRandomEvent() {
-  const events = ['ROUTE_CREATED',
-  'ROUTE_RECEIVED',
-  'ROUTE_OPENED',
-  'ROUTE_STARTED',
-  'ROUTE_ARRIVED_STOP',
-  'ROUTE_COMPLETED', 
-  'APP_OPENED', 
-  'APP_SESSION_STARTED'];
-  return events[randomIntBetween(0, 2)];
+  const events = [
+    'ROUTE_CREATED',
+    'ROUTE_RECEIVED',
+    'ROUTE_OPENED',
+    'ROUTE_STARTED',
+    'ROUTE_ARRIVED_STOP',
+    'ROUTE_COMPLETED', 
+    'APP_OPENED', 
+    'APP_SESSION_STARTED'
+  ];
+  return events[randomIntBetween(0, events.length - 1)];
 }
 
-setInterval(()=> {
+setInterval(() => {
   pushEvent(getRandomUserId(), getRandomEvent());
-}, 100)
-
+}, 100);
 
 // Define the /metrics endpoint
 app.get('/metrics', async (request, reply) => {
-  reply.header('Content-Type', register.contentType);
-  reply.send(await register.metrics());
+  const metrics = await register.metrics();
+  reply.set('Content-Type', register.contentType);
+  reply.end(metrics);
 });
 
 // Start the server
-const start = async () => {
-  try {
-    await app.server.listen(3000, '0.0.0.0');
-    app.log.info(`Metrics server listening at http://localhost:3000`);
-  } catch (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
-};
-
-start();
+app.listen(3000, () => {
+  console.log(`Metrics server listening at http://localhost:3000`);
+});

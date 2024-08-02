@@ -26,7 +26,7 @@ async function queryEventCounts(startTime: string, endTime: string) {
   try {
     const response = await axios.get<PrometheusResponse>(prometheusUrl, { params });
     const data = response.data.data.result;
-    console.log('data', data);
+    console.log('data', JSON.stringify(data, null, 2));
     data.forEach(result => {
       const userId = result.metric.userId;
       const event = result.metric.event;

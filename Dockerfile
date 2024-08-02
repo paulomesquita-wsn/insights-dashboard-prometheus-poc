@@ -11,7 +11,7 @@ RUN npm install
 # Copy application code
 COPY . .
 
-RUN npm i -g tsx
+RUN npx tsc main.ts
 
 # Start the app
-CMD ["tsx", "main.ts"]
+CMD ["node", "main.js"]
