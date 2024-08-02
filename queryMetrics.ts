@@ -13,6 +13,7 @@ interface PrometheusResponse {
 
 // Function to query event data from Prometheus
 async function queryEventCounts(startTime: string, endTime: string) {
+  console.log('Querying event counts from Prometheus...', startTime, endTime);
   const prometheusUrl = `http://localhost:9090/api/v1/query_range`;
   const query = 'sum by (userId, event) (event_count)';
   const params = {
@@ -25,7 +26,7 @@ async function queryEventCounts(startTime: string, endTime: string) {
   try {
     const response = await axios.get<PrometheusResponse>(prometheusUrl, { params });
     const data = response.data.data.result;
-
+    console.log('data', data);
     data.forEach(result => {
       const userId = result.metric.userId;
       const event = result.metric.event;
